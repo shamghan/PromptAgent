@@ -1,0 +1,42 @@
+/**
+ * buildPrompt.js
+ * Assembles the system prompt and the user message sent to the Groq API.
+ * Only includes lines where the input field has a non-empty value.
+ */
+
+/**
+ * Builds the user message from the form fields.
+ * @param {Object} inputs - All form field values
+ * @returns {string} Formatted user message
+ */
+export function buildUserMessage(inputs) {
+  const { fileName, className, methodName, lineNumber, taskName, taskType, taskDesc, issue } = inputs;
+
+  const lines = ['Convert this developer context into one optimised Claude prompt:\n'];
+
+  if (fileName?.trim())   lines.push(`File:   ${fileName.trim()}`);
+  if (className?.trim())  lines.push(`Class:  ${className.trim()}`);
+  if (methodName?.trim()) lines.push(`Method: ${methodName.trim()}`);
+  if (lineNumber?.toString().trim()) lines.push(`Line:   ${lineNumber}`);
+
+  const taskLabel = [taskName?.trim(), taskType?.trim()].filter(Boolean).join(' (');
+  if (taskLabel) {
+    lines.push(`Task:   ${taskName?.trim()}${taskType?.trim() ? ` (${taskType.trim()})` : ''}`);
+  }
+
+  if (taskDesc?.trim()) lines.push(`Desc:   ${taskDesc.trim()}`);
+  if (issue?.trim())    lines.push(`Issue:  ${issue.trim()}`);
+
+  return lines.join('\n');
+}
+
+/**
+ * Builds the complete messages array for the Groq API.
+ * @param {string} systemPrompt - The (possibly customised) system prompt
+ * @param {Object} inputs       - All form field values
+ * @returns {{ systemPrompt: string, userMessage: string }}
+ */
+export function buildPromptPayload(systemPrompt, inputs) {
+  const userMessage = buildUserMessage(inputs);
+  return { systemPrompt, userMessage };
+}
