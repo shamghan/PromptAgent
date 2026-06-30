@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { TASK_TYPES } from '../utils/constants';
 
-export default function PromptForm({ inputs, setInputs, onSubmit, onClear, onToggleHistory, onOpenSettings, loading, error }) {
+export default function PromptForm({ inputs, setInputs, onSubmit, onClear, onToggleHistory, onOpenSettings, onOpenBuilder, loading, error }) {
   const issueRef = useRef(null);
 
   function handleChange(e) {
@@ -28,14 +28,14 @@ export default function PromptForm({ inputs, setInputs, onSubmit, onClear, onTog
             { id: 'fileName',   label: 'File name',    placeholder: 'UserService.java',  type: 'text',   tab: 1 },
             { id: 'className',  label: 'Class name',   placeholder: 'UserService',       type: 'text',   tab: 2 },
             { id: 'methodName', label: 'Method name',  placeholder: 'getUserById',       type: 'text',   tab: 3 },
-            { id: 'lineNumber', label: 'Line number',  placeholder: '142',               type: 'number', tab: 4 },
+            { id: 'lineNumber', label: 'Line number',  placeholder: '142 or 10-25',      type: 'text',   tab: 4 },
           ].map(({ id, label, placeholder, type, tab }) => (
             <div key={id}>
               <label htmlFor={id} className="field-label">{label}</label>
               <input
                 id={id} name={id} type={type} tabIndex={tab}
                 value={inputs[id]} onChange={handleChange}
-                placeholder={placeholder} min={type === 'number' ? 1 : undefined}
+                placeholder={placeholder}
                 className="field"
               />
             </div>
@@ -147,7 +147,12 @@ export default function PromptForm({ inputs, setInputs, onSubmit, onClear, onTog
           History
         </button>
 
-        <button type="button" tabIndex={12} onClick={onOpenSettings} className="btn-ghost text-slate-600 bg-white shadow-sm border-slate-200 hover:bg-slate-50">
+        <button type="button" tabIndex={12} onClick={onOpenBuilder} className="btn-ghost text-violet-700 bg-violet-50 shadow-sm border-violet-200 hover:bg-violet-100">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+          Form Builder
+        </button>
+
+        <button type="button" tabIndex={13} onClick={onOpenSettings} className="btn-ghost text-slate-600 bg-white shadow-sm border-slate-200 hover:bg-slate-50">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
           Settings
         </button>
