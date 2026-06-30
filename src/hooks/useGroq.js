@@ -16,10 +16,11 @@ export function useGroq(systemPrompt) {
 
   /**
    * Calls the Groq API and returns the generated prompt string.
-   * @param {Object} inputs - Form field values
+   * @param {Object|null} inputs        - Form field values (default form)
+   * @param {string|null} rawUserMessage - Pre-built message (custom form)
    * @returns {Promise<string|null>} The generated prompt or null on error
    */
-  const generate = useCallback(async (inputs) => {
+  const generate = useCallback(async (inputs, rawUserMessage = null) => {
     setLoading(true);
     setError(null);
 
@@ -31,7 +32,8 @@ export function useGroq(systemPrompt) {
       return null;
     }
 
-    const { systemPrompt: sys, userMessage } = buildPromptPayload(systemPrompt, inputs);
+    const sys = systemPrompt;
+    const userMessage = rawUserMessage ?? buildPromptPayload(systemPrompt, inputs).userMessage;
 
     const requestBody = {
       model:       GROQ_CONFIG.model,
