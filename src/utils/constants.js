@@ -30,14 +30,25 @@ export const STORAGE_KEYS = {
   SYSTEM_PROMPT: 'pap_system_prompt',
   THEME: 'pap_theme',
   CUSTOM_SCHEMA: 'pap_custom_schema',
+  SELECTED_MODEL: 'pap_selected_model',
 };
+
+export const AVAILABLE_MODELS = [
+  { value: 'llama-3.3-70b-versatile', label: 'Llama 3.3 70B (Groq)' },
+  { value: 'gemma-4-26b-a4b-it', label: 'Gemma 4 26B (Gemini)' },
+];
 
 // ─── API config ───────────────────────────────────────────────────────────────
 export const GROQ_CONFIG = {
   endpoint: 'https://api.groq.com/openai/v1/chat/completions',
-  model: 'llama-3.3-70b-versatile',
+  model: 'llama-3.3-70b-versatile', // Default fallback
   maxTokens: 1024,
   temperature: 0.4,
+};
+
+export const GEMINI_CONFIG = {
+  endpointBase: 'https://generativelanguage.googleapis.com/v1beta/models/',
+  // Appended per request: `${model}:generateContent?key=${API_KEY}`
 };
 
 // ─── History ──────────────────────────────────────────────────────────────────
