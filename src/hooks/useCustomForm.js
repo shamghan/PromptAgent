@@ -13,18 +13,20 @@ function loadTemplates() {
   try {
     const raw = localStorage.getItem(SCHEMA_KEY);
     if (!raw) return [];
-    
+
     const parsed = JSON.parse(raw);
-    
+
     // Migration: If it's an array of fields (old format), wrap it in a template
     if (parsed.length > 0 && !parsed[0].schema) {
-      return [{
-        id: 'default-template',
-        name: 'Default Template',
-        schema: parsed
-      }];
+      return [
+        {
+          id: 'default-template',
+          name: 'Default Template',
+          schema: parsed,
+        },
+      ];
     }
-    
+
     return parsed;
   } catch {
     return [];
@@ -44,11 +46,13 @@ function blankValues(schema) {
 
 export function useCustomForm() {
   const [templates, setTemplates] = useState(loadTemplates);
-  const [activeTemplateId, setActiveTemplateId] = useState(templates.length > 0 ? templates[0].id : null);
-  
+  const [activeTemplateId, setActiveTemplateId] = useState(
+    templates.length > 0 ? templates[0].id : null,
+  );
+
   // Find the active template's schema, or fallback to an empty array
-  const activeSchema = templates.find(t => t.id === activeTemplateId)?.schema || [];
-  
+  const activeSchema = templates.find((t) => t.id === activeTemplateId)?.schema || [];
+
   const [customValues, setCustomValues] = useState(() => blankValues(activeSchema));
 
   // Whenever active template changes, reset the values
@@ -56,13 +60,16 @@ export function useCustomForm() {
     setCustomValues(blankValues(activeSchema));
   }, [activeTemplateId, activeSchema]); // We depend on activeSchema reference, but it's safe if templates update cleanly
 
-  const saveTemplatesState = useCallback((newTemplates) => {
-    setTemplates(newTemplates);
-    saveTemplates(newTemplates);
-    if (newTemplates.length > 0 && !newTemplates.find(t => t.id === activeTemplateId)) {
-      setActiveTemplateId(newTemplates[0].id);
-    }
-  }, [activeTemplateId]);
+  const saveTemplatesState = useCallback(
+    (newTemplates) => {
+      setTemplates(newTemplates);
+      saveTemplates(newTemplates);
+      if (newTemplates.length > 0 && !newTemplates.find((t) => t.id === activeTemplateId)) {
+        setActiveTemplateId(newTemplates[0].id);
+      }
+    },
+    [activeTemplateId],
+  );
 
   const handleCustomChange = useCallback((id, value) => {
     setCustomValues((prev) => ({ ...prev, [id]: value }));
