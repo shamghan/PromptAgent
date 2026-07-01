@@ -1,5 +1,21 @@
-import { existsSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import { execSync } from 'child_process';
+
+// Load .env into process.env
+try {
+  const envFile = readFileSync('.env', 'utf-8');
+  for (const line of envFile.split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const eq = trimmed.indexOf('=');
+    if (eq === -1) continue;
+    const k = trimmed.slice(0, eq).trim();
+    const v = trimmed.slice(eq + 1).trim().replace(/^['"]|['"]$/g, '');
+    if (!process.env[k]) process.env[k] = v;
+  }
+} catch {
+  // .env file missing — rely on process.env as fallback
+}
 
 let passed = 0;
 let failed = 0;
