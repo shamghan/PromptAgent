@@ -1,9 +1,16 @@
 import { useEffect, useState } from 'react';
-import { DEFAULT_SYSTEM_PROMPT } from '../utils/constants';
+import { DEFAULT_SYSTEM_PROMPT, AVAILABLE_MODELS, STORAGE_KEYS, GROQ_CONFIG } from '../utils/constants';
 
 export default function SettingsModal({ systemPrompt, onSave, onClose, isOpen }) {
   const [draft, setDraft] = useState(systemPrompt);
   const [changed, setChanged] = useState(false);
+  
+  // Model state
+  const [selectedModel, setSelectedModel] = useState(() => {
+    try { return localStorage.getItem(STORAGE_KEYS.SELECTED_MODEL) || GROQ_CONFIG.model; }
+    catch { return GROQ_CONFIG.model; }
+  });
+  const [modelChanged, setModelChanged] = useState(false);
 
   useEffect(() => { setDraft(systemPrompt); setChanged(false); }, [systemPrompt]);
 
@@ -18,8 +25,35 @@ export default function SettingsModal({ systemPrompt, onSave, onClose, isOpen })
     setChanged(e.target.value !== systemPrompt);
   }
 
-  function handleSave() { onSave(draft.trim() || DEFAULT_SYSTEM_PROMPT); onClose(); }
-  function handleReset() { setDraft(DEFAULT_SYSTEM_PROMPT); setChanged(DEFAULT_SYSTEM_PROMPT !== systemPrompt); }
+  function handleModelChange(e) {
+    setSelectedModel(e.target.value);
+    const currentSaved = (() => {
+      try { return localStorage.getItem(STORAGE_KEYS.SELECTED_MODEL) || GROQ_CONFIG.model; }
+      catch { return GROQ_CONFIG.model; }
+    })();
+    setModelChanged(e.target.value !== currentSaved);
+  }
+
+  function handleSave() { 
+    onSave(draft.trim() || DEFAULT_SYSTEM_PROMPT);
+    if (modelChanged) {
+      try { localStorage.setItem(STORAGE_KEYS.SELECTED_MODEL, selectedModel); } catch {}
+      // We force reload to apply model change cleanly across the app, or we can just let useGroq read from localstorage on next click.
+      // Better to dispatch a custom event or just let it be read on generate. useGroq will read it.
+      setModelChanged(false);
+    }
+    onClose(); 
+  }
+  
+  function handleReset() { 
+    setDraft(DEFAULT_SYSTEM_PROMPT); 
+    setChanged(DEFAULT_SYSTEM_PROMPT !== systemPrompt); 
+    setSelectedModel(GROQ_CONFIG.model);
+    setModelChanged(GROQ_CONFIG.model !== (() => {
+      try { return localStorage.getItem(STORAGE_KEYS.SELECTED_MODEL) || GROQ_CONFIG.model; }
+      catch { return GROQ_CONFIG.model; }
+    })());
+  }
 
   if (!isOpen) return null;
 
@@ -46,11 +80,35 @@ export default function SettingsModal({ systemPrompt, onSave, onClose, isOpen })
         </div>
 
         {/* Body */}
-        <div className="p-6 bg-slate-50/50">
-          <div className="mb-4 text-sm text-slate-600 bg-brand-50 border border-brand-100 rounded-xl p-4 flex gap-3">
-            <svg className="w-5 h-5 text-brand-500 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            <p>This instruction is sent to the AI <strong>before</strong> your developer context. It controls the style and quality of the output. Edits are saved locally in your browser.</p>
+        <div className="p-6 bg-slate-50/50 space-y-6">
+          
+          {/* Model Selection */}
+          <div>
+             <label className="field-label mb-2 block">AI Model</label>
+             <div className="relative">
+                <select
+                  className="field appearance-none pr-10 cursor-pointer"
+                  value={selectedModel}
+                  onChange={handleModelChange}
+                >
+                  {AVAILABLE_MODELS.map(m => (
+                    <option key={m.value} value={m.value}>{m.label}</option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-400">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
           </div>
+
+          <div>
+            <label className="field-label mb-2 block">System Prompt</label>
+            <div className="mb-4 text-sm text-slate-600 bg-brand-50 border border-brand-100 rounded-xl p-4 flex gap-3">
+              <svg className="w-5 h-5 text-brand-500 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              <p>This instruction is sent to the AI <strong>before</strong> your developer context. It controls the style and quality of the output. Edits are saved locally in your browser.</p>
+            </div>
 
           <div className="relative rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden focus-within:border-brand-500 focus-within:ring-4 focus-within:ring-brand-500/10 transition-all">
             <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 border-b border-slate-200">
@@ -64,6 +122,7 @@ export default function SettingsModal({ systemPrompt, onSave, onClose, isOpen })
           <div className="flex justify-end mt-2">
             <span className="text-xs font-mono text-slate-400 font-medium">{draft.length} chars</span>
           </div>
+          </div>
         </div>
 
         {/* Footer */}
@@ -74,7 +133,7 @@ export default function SettingsModal({ systemPrompt, onSave, onClose, isOpen })
           <div className="flex gap-2">
             <button onClick={onClose} className="btn-ghost">Cancel</button>
             <button onClick={handleSave} className="btn-primary">
-              {changed ? 'Save changes' : 'Save'}
+              {changed || modelChanged ? 'Save changes' : 'Save'}
             </button>
           </div>
         </div>
