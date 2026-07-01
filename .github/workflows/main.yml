@@ -14,9 +14,13 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
-    name: Build (Node.js ${{ matrix.node-version }})
+    name: Node ${{ matrix.node-version }}
     runs-on: ubuntu-latest
 
     strategy:
@@ -25,6 +29,7 @@ jobs:
         node-version: [20, 22]
 
     env:
+      CI: true
       VITE_GROQ_API_KEY: ${{ secrets.VITE_GROQ_API_KEY }}
       VITE_GEMINI_API_KEY: ${{ secrets.VITE_GEMINI_API_KEY }}
       VITE_GEMINI2_API_KEY: ${{ secrets.VITE_GEMINI2_API_KEY }}
@@ -43,9 +48,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: React Doctor
+        run: npm run doctor
+
       - name: Check formatting
         run: npm run format:check
-        continue-on-error: false
 
       - name: Lint
         run: npm run lint
