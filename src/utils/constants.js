@@ -35,7 +35,8 @@ export const STORAGE_KEYS = {
 
 export const AVAILABLE_MODELS = [
   { value: 'llama-3.3-70b-versatile', label: 'Llama 3.3 70B (Groq)' },
-  { value: 'gemma-4-26b-a4b-it', label: 'Gemma 4 26B (Gemini)' },
+  { value: 'gemma-4-26b-a4b-it', label: 'Gemma 4 26B (Google)' },
+  { value: 'mistral-large-latest', label: 'Mistral Large (Mistral AI)' },
 ];
 
 // ─── API config ───────────────────────────────────────────────────────────────
@@ -49,6 +50,10 @@ export const GROQ_CONFIG = {
 export const GEMINI_CONFIG = {
   endpointBase: 'https://generativelanguage.googleapis.com/v1beta/models/',
   // Appended per request: `${model}:generateContent?key=${API_KEY}`
+};
+
+export const MISTRAL_CONFIG = {
+  endpoint: 'https://api.mistral.ai/v1/chat/completions',
 };
 
 // ─── History ──────────────────────────────────────────────────────────────────
