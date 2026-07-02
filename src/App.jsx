@@ -210,7 +210,7 @@ export default function App() {
                 Prompt Agent Portal
               </h1>
               <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                Generate AI-ready prompts securely
+                Generate AI-ready prompts, right in your browser
               </p>
             </div>
           </div>
