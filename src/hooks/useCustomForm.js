@@ -4,7 +4,7 @@
  * Templates are persisted to localStorage; values reset on page load.
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { STORAGE_KEYS } from '../utils/constants';
 
 const SCHEMA_KEY = STORAGE_KEYS.CUSTOM_SCHEMA;
@@ -13,18 +13,20 @@ function loadTemplates() {
   try {
     const raw = localStorage.getItem(SCHEMA_KEY);
     if (!raw) return [];
-    
+
     const parsed = JSON.parse(raw);
-    
+
     // Migration: If it's an array of fields (old format), wrap it in a template
     if (parsed.length > 0 && !parsed[0].schema) {
-      return [{
-        id: 'default-template',
-        name: 'Default Template',
-        schema: parsed
-      }];
+      return [
+        {
+          id: 'default-template',
+          name: 'Default Template',
+          schema: parsed,
+        },
+      ];
     }
-    
+
     return parsed;
   } catch {
     return [];
@@ -34,7 +36,9 @@ function loadTemplates() {
 function saveTemplates(templates) {
   try {
     localStorage.setItem(SCHEMA_KEY, JSON.stringify(templates));
-  } catch {}
+  } catch {
+    // localStorage may be full or unavailable
+  }
 }
 
 /** Build a blank values object from a schema */
@@ -44,25 +48,37 @@ function blankValues(schema) {
 
 export function useCustomForm() {
   const [templates, setTemplates] = useState(loadTemplates);
-  const [activeTemplateId, setActiveTemplateId] = useState(templates.length > 0 ? templates[0].id : null);
-  
+  const [activeTemplateId, setActiveTemplateId] = useState(
+    templates.length > 0 ? templates[0].id : null,
+  );
+
   // Find the active template's schema, or fallback to an empty array
-  const activeSchema = templates.find(t => t.id === activeTemplateId)?.schema || [];
-  
+  const activeSchema = useMemo(
+    () => templates.find((t) => t.id === activeTemplateId)?.schema || [],
+    [templates, activeTemplateId],
+  );
+
   const [customValues, setCustomValues] = useState(() => blankValues(activeSchema));
 
   // Whenever active template changes, reset the values
+  const prevTemplateIdRef = useRef(activeTemplateId);
   useEffect(() => {
-    setCustomValues(blankValues(activeSchema));
-  }, [activeTemplateId, activeSchema]); // We depend on activeSchema reference, but it's safe if templates update cleanly
-
-  const saveTemplatesState = useCallback((newTemplates) => {
-    setTemplates(newTemplates);
-    saveTemplates(newTemplates);
-    if (newTemplates.length > 0 && !newTemplates.find(t => t.id === activeTemplateId)) {
-      setActiveTemplateId(newTemplates[0].id);
+    if (prevTemplateIdRef.current !== activeTemplateId) {
+      setCustomValues(blankValues(activeSchema));
+      prevTemplateIdRef.current = activeTemplateId;
     }
-  }, [activeTemplateId]);
+  }, [activeTemplateId, activeSchema]);
+
+  const saveTemplatesState = useCallback(
+    (newTemplates) => {
+      setTemplates(newTemplates);
+      saveTemplates(newTemplates);
+      if (newTemplates.length > 0 && !newTemplates.find((t) => t.id === activeTemplateId)) {
+        setActiveTemplateId(newTemplates[0].id);
+      }
+    },
+    [activeTemplateId],
+  );
 
   const handleCustomChange = useCallback((id, value) => {
     setCustomValues((prev) => ({ ...prev, [id]: value }));

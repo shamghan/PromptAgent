@@ -30,7 +30,7 @@ export function useHistory() {
   /** Add a new entry; trims to MAX_HISTORY */
   const addEntry = useCallback((inputs, output) => {
     const entry = {
-      id:        crypto.randomUUID(),
+      id: crypto.randomUUID(),
       timestamp: new Date().toISOString(),
       inputs,
       output,

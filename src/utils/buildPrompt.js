@@ -10,12 +10,13 @@
  * @returns {string} Formatted user message
  */
 export function buildUserMessage(inputs) {
-  const { fileName, className, methodName, lineNumber, taskName, taskType, taskDesc, issue } = inputs;
+  const { fileName, className, methodName, lineNumber, taskName, taskType, taskDesc, issue } =
+    inputs;
 
   const lines = ['Convert this developer context into one optimised AI prompt:\n'];
 
-  if (fileName?.trim())   lines.push(`File:   ${fileName.trim()}`);
-  if (className?.trim())  lines.push(`Class:  ${className.trim()}`);
+  if (fileName?.trim()) lines.push(`File:   ${fileName.trim()}`);
+  if (className?.trim()) lines.push(`Class:  ${className.trim()}`);
   if (methodName?.trim()) lines.push(`Method: ${methodName.trim()}`);
   if (lineNumber?.toString().trim()) {
     const ln = lineNumber.toString().trim();
@@ -40,7 +41,7 @@ export function buildUserMessage(inputs) {
   }
 
   if (taskDesc?.trim()) lines.push(`Desc:   ${taskDesc.trim()}`);
-  if (issue?.trim())    lines.push(`Issue:  ${issue.trim()}`);
+  if (issue?.trim()) lines.push(`Issue:  ${issue.trim()}`);
 
   return lines.join('\n');
 }
@@ -78,4 +79,3 @@ export function buildCustomUserMessage(schema, values) {
 
   return lines.join('\n');
 }
-
