@@ -4,7 +4,7 @@
  * Templates are persisted to localStorage; values reset on page load.
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { STORAGE_KEYS } from '../utils/constants';
 
 const SCHEMA_KEY = STORAGE_KEYS.CUSTOM_SCHEMA;
@@ -36,7 +36,9 @@ function loadTemplates() {
 function saveTemplates(templates) {
   try {
     localStorage.setItem(SCHEMA_KEY, JSON.stringify(templates));
-  } catch {}
+  } catch {
+    // localStorage may be full or unavailable
+  }
 }
 
 /** Build a blank values object from a schema */
@@ -51,14 +53,21 @@ export function useCustomForm() {
   );
 
   // Find the active template's schema, or fallback to an empty array
-  const activeSchema = templates.find((t) => t.id === activeTemplateId)?.schema || [];
+  const activeSchema = useMemo(
+    () => templates.find((t) => t.id === activeTemplateId)?.schema || [],
+    [templates, activeTemplateId],
+  );
 
   const [customValues, setCustomValues] = useState(() => blankValues(activeSchema));
 
   // Whenever active template changes, reset the values
+  const prevTemplateIdRef = useRef(activeTemplateId);
   useEffect(() => {
-    setCustomValues(blankValues(activeSchema));
-  }, [activeTemplateId, activeSchema]); // We depend on activeSchema reference, but it's safe if templates update cleanly
+    if (prevTemplateIdRef.current !== activeTemplateId) {
+      setCustomValues(blankValues(activeSchema));
+      prevTemplateIdRef.current = activeTemplateId;
+    }
+  }, [activeTemplateId, activeSchema]);
 
   const saveTemplatesState = useCallback(
     (newTemplates) => {

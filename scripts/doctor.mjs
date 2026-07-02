@@ -61,6 +61,13 @@ try {
 }
 
 try {
+  execSync('npm run lint', { stdio: 'pipe', encoding: 'utf-8' });
+  check('Lint', true);
+} catch {
+  check('Lint', false);
+}
+
+try {
   execSync('npm run build', { stdio: 'pipe', encoding: 'utf-8' });
   check('Build', true);
 } catch {
