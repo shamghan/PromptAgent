@@ -37,9 +37,7 @@ describe('useCustomForm', () => {
   });
 
   it('migrates old flat-schema format to wrapped template', () => {
-    const oldSchema = [
-      { id: 'f1', label: 'Field 1', type: 'text' },
-    ];
+    const oldSchema = [{ id: 'f1', label: 'Field 1', type: 'text' }];
     localStorage.setItem(SCHEMA_KEY, JSON.stringify(oldSchema));
     const { result } = renderHook(() => useCustomForm());
     expect(result.current.templates).toHaveLength(1);

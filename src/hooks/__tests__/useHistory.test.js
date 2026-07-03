@@ -17,7 +17,9 @@ describe('useHistory', () => {
   });
 
   it('loads existing history from localStorage', () => {
-    const existing = [{ id: '1', timestamp: '2024-01-01', inputs: { issue: 'test' }, output: 'out' }];
+    const existing = [
+      { id: '1', timestamp: '2024-01-01', inputs: { issue: 'test' }, output: 'out' },
+    ];
     localStorage.setItem(HISTORY_KEY, JSON.stringify(existing));
     const { result } = renderHook(() => useHistory());
     expect(result.current.history).toEqual(existing);

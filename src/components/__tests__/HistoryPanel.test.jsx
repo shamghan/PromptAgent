@@ -20,7 +20,14 @@ const mockHistory = [
 describe('HistoryPanel', () => {
   it('returns null when isOpen is false', () => {
     const { container } = render(
-      <HistoryPanel history={[]} isOpen={false} onLoad={() => {}} onDelete={() => {}} onClearAll={() => {}} onClose={() => {}} />,
+      <HistoryPanel
+        history={[]}
+        isOpen={false}
+        onLoad={() => {}}
+        onDelete={() => {}}
+        onClearAll={() => {}}
+        onClose={() => {}}
+      />,
     );
     expect(container.innerHTML).toBe('');
   });

@@ -16,9 +16,7 @@ beforeEach(() => {
 
 describe('SettingsModal', () => {
   it('returns null when isOpen is false', () => {
-    const { container } = render(
-      <SettingsModal {...defaultProps} isOpen={false} />,
-    );
+    const { container } = render(<SettingsModal {...defaultProps} isOpen={false} />);
     expect(container.innerHTML).toBe('');
   });
 
