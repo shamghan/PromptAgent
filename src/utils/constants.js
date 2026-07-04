@@ -35,7 +35,7 @@ export const STORAGE_KEYS = {
 
 export const AVAILABLE_MODELS = [
   { value: 'llama-3.3-70b-versatile', label: 'Llama 3.3 70B (Groq)' },
-  { value: 'gemma-4-26b-a4b-it', label: 'Gemma 4 26B (Gemini)' },
+  { value: 'gemma-4-31b-it', label: 'Gemma 4 31B (Gemini)' },
   { value: 'mistral-large-latest', label: 'Mistral Large (Mistral)' },
 ];
 
