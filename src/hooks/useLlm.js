@@ -112,7 +112,7 @@ export function useLlm(systemPrompt) {
           // but the easiest robust way is to combine them or use system_instruction object.
           // For standard Gemini API:
           const requestBody = {
-            system_instruction: {
+            systemInstruction: {
               parts: [{ text: sys }],
             },
             contents: [
