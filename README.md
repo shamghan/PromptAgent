@@ -64,9 +64,9 @@ Open `src/utils/constants.js` and edit the `GROQ_CONFIG` object:
 
 ```js
 export const GROQ_CONFIG = {
-  endpoint:    'https://api.groq.com/openai/v1/chat/completions',
-  model:       'llama-3.3-70b-versatile',   // ← change this
-  maxTokens:   1024,
+  endpoint: 'https://api.groq.com/openai/v1/chat/completions',
+  model: 'llama-3.3-70b-versatile', // ← change this
+  maxTokens: 1024,
   temperature: 0.4,
 };
 ```

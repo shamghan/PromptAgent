@@ -56,13 +56,13 @@ src/
 
 ## localStorage keys (all `pap_` prefix)
 
-| Key | What |
-|---|---|
-| `pap_history` | Array of {id, timestamp, inputs, output} (max 10) |
-| `pap_system_prompt` | Custom system prompt string |
-| `pap_form_mode` | `"default"` or `"custom"` |
-| `pap_custom_schema` | Array of field definition objects |
-| `pap_theme` | Defined but unused in current UI |
+| Key                 | What                                              |
+| ------------------- | ------------------------------------------------- |
+| `pap_history`       | Array of {id, timestamp, inputs, output} (max 10) |
+| `pap_system_prompt` | Custom system prompt string                       |
+| `pap_form_mode`     | `"default"` or `"custom"`                         |
+| `pap_custom_schema` | Array of field definition objects                 |
+| `pap_theme`         | Defined but unused in current UI                  |
 
 ## Dev notes
 

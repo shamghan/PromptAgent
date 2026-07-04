@@ -10,7 +10,10 @@ try {
     const eq = trimmed.indexOf('=');
     if (eq === -1) continue;
     const k = trimmed.slice(0, eq).trim();
-    const v = trimmed.slice(eq + 1).trim().replace(/^['"]|['"]$/g, '');
+    const v = trimmed
+      .slice(eq + 1)
+      .trim()
+      .replace(/^['"]|['"]$/g, '');
     if (!process.env[k]) process.env[k] = v;
   }
 } catch {
@@ -75,6 +78,8 @@ try {
 }
 
 const total = passed + failed;
-console.log(`\n\u2514\u2500\u2500 ${passed}/${total} checks passed${failed > 0 ? `, ${failed} failed` : ''}\n`);
+console.log(
+  `\n\u2514\u2500\u2500 ${passed}/${total} checks passed${failed > 0 ? `, ${failed} failed` : ''}\n`,
+);
 
 process.exit(failed > 0 ? 1 : 0);

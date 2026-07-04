@@ -44,10 +44,7 @@ export function useLlm(systemPrompt) {
         return null;
       }
 
-      if (
-        usesGeminiApi &&
-        (!geminiKey || geminiKey === 'your_gemini_api_key_here')
-      ) {
+      if (usesGeminiApi && (!geminiKey || geminiKey === 'your_gemini_api_key_here')) {
         setError(
           'No Gemini API key found. Add VITE_GEMINI_API_KEY to your .env file and restart the dev server.',
         );
