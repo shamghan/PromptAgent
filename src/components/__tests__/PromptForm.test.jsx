@@ -17,12 +17,12 @@ function renderForm(props = {}) {
   return render(
     <PromptForm
       inputs={defaultInputs}
-      setInputs={() => {}}
-      onSubmit={() => {}}
-      onClear={() => {}}
-      onToggleHistory={() => {}}
-      onOpenSettings={() => {}}
-      onOpenBuilder={() => {}}
+      setInputs={() => { }}
+      onSubmit={() => { }}
+      onClear={() => { }}
+      onToggleHistory={() => { }}
+      onOpenSettings={() => { }}
+      onOpenBuilder={() => { }}
       loading={false}
       error={null}
       {...props}
@@ -34,7 +34,7 @@ describe('PromptForm', () => {
   it('renders all form sections', () => {
     renderForm();
     expect(screen.getByText('Code Context')).toBeTruthy();
-    expect(screen.getByText('Azure DevOps Task')).toBeTruthy();
+    expect(screen.getByText('Board Task')).toBeTruthy();
     expect(screen.getByText('Context & Problem')).toBeTruthy();
   });
 

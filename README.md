@@ -8,7 +8,7 @@ Built with React 18 + Vite + Tailwind CSS v3. Runs entirely in the browser — n
 
 ## What it does
 
-1. You fill in structured context about your code: file, class, method, line number, Azure DevOps task, description, and the problem/ask.
+1. You fill in structured context about your code: file, class, method, line number, Board task, description, and the problem/ask.
 2. The app sends that context to Groq's LLM with a carefully crafted system prompt.
 3. The model returns a single, sharp, Claude-ready prompt you can paste directly into Claude.
 4. Your last 10 generated prompts are saved in browser localStorage for quick reuse.

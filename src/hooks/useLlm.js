@@ -33,9 +33,7 @@ export function useLlm(systemPrompt) {
       const isMistral = activeModel.startsWith('mistral');
 
       const groqKey = import.meta.env.VITE_GROQ_API_KEY;
-      const geminiKey = isGemma
-        ? import.meta.env.VITE_GEMINI2_API_KEY
-        : import.meta.env.VITE_GEMINI_API_KEY;
+      const geminiKey = import.meta.env.VITE_GEMINI_API_KEY;
       const mistralKey = import.meta.env.VITE_MISTRAL_API_KEY;
 
       if (!usesGeminiApi && !isMistral && (!groqKey || groqKey === 'your_groq_api_key_here')) {
@@ -48,9 +46,7 @@ export function useLlm(systemPrompt) {
 
       if (
         usesGeminiApi &&
-        (!geminiKey ||
-          geminiKey === 'your_gemini_api_key_here' ||
-          geminiKey === 'your_gemini2_api_key_here')
+        (!geminiKey || geminiKey === 'your_gemini_api_key_here')
       ) {
         setError(
           'No Gemini API key found. Add VITE_GEMINI_API_KEY to your .env file and restart the dev server.',
