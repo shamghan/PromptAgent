@@ -50,6 +50,6 @@ describe('OutputBox', () => {
 
   it('shows loading overlay when loading is true', () => {
     render(<OutputBox output="" onRegenerate={() => {}} loading={true} />);
-    expect(screen.getByText('Writing prompt...')).toBeTruthy();
+    expect(screen.getByText('Writing prompt…')).toBeTruthy();
   });
 });
