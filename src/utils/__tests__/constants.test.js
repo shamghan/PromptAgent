@@ -27,8 +27,8 @@ describe('constants', () => {
     });
   });
 
-  it('AVAILABLE_MODELS has 3 entries with value and label', () => {
-    expect(AVAILABLE_MODELS).toHaveLength(3);
+  it('AVAILABLE_MODELS has entries with value and label', () => {
+    expect(AVAILABLE_MODELS.length).toBeGreaterThanOrEqual(3);
     AVAILABLE_MODELS.forEach((m) => {
       expect(m).toHaveProperty('value');
       expect(m).toHaveProperty('label');

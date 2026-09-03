@@ -30,7 +30,7 @@ export function useLlm(systemPrompt) {
       const isGemini = activeModel.startsWith('gemini');
       const isGemma = activeModel.startsWith('gemma');
       const usesGeminiApi = isGemini || isGemma;
-      const isMistral = activeModel.startsWith('mistral');
+      const isMistral = activeModel.startsWith('mistral') || activeModel.startsWith('codestral');
 
       const groqKey = import.meta.env.VITE_GROQ_API_KEY;
       const geminiKey = import.meta.env.VITE_GEMINI_API_KEY;

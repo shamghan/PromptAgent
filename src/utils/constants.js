@@ -35,6 +35,7 @@ export const STORAGE_KEYS = {
 
 export const AVAILABLE_MODELS = [
   { value: 'openai/gpt-oss-120b', label: 'GPT OSS 120B (Groq)' },
+  { value: 'codestral-latest', label: 'Codestral (Mistral)' },
   { value: 'gemma-4-31b-it', label: 'Gemma 4 31B (Gemini)' },
   { value: 'mistral-large-latest', label: 'Mistral Large (Mistral)' },
 ];
