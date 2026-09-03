@@ -5,7 +5,13 @@
  */
 
 import { useState, useCallback } from 'react';
-import { GROQ_CONFIG, GEMINI_CONFIG, MISTRAL_CONFIG, STORAGE_KEYS } from '../utils/constants';
+import {
+  GROQ_CONFIG,
+  GEMINI_CONFIG,
+  MISTRAL_CONFIG,
+  OPENROUTER_CONFIG,
+  STORAGE_KEYS,
+} from '../utils/constants';
 import { buildPromptPayload } from '../utils/buildPrompt';
 
 export function useLlm(systemPrompt) {
@@ -30,13 +36,20 @@ export function useLlm(systemPrompt) {
       const isGemini = activeModel.startsWith('gemini');
       const isGemma = activeModel.startsWith('gemma');
       const usesGeminiApi = isGemini || isGemma;
-      const isMistral = activeModel.startsWith('mistral');
+      const isMistral = activeModel.startsWith('mistral') || activeModel.startsWith('codestral');
+      const isOpenRouter = activeModel.startsWith('openrouter/');
 
       const groqKey = import.meta.env.VITE_GROQ_API_KEY;
       const geminiKey = import.meta.env.VITE_GEMINI_API_KEY;
       const mistralKey = import.meta.env.VITE_MISTRAL_API_KEY;
+      const openrouterKey = import.meta.env.VITE_OPENROUTER_API_KEY;
 
-      if (!usesGeminiApi && !isMistral && (!groqKey || groqKey === 'your_groq_api_key_here')) {
+      if (
+        !usesGeminiApi &&
+        !isMistral &&
+        !isOpenRouter &&
+        (!groqKey || groqKey === 'your_groq_api_key_here')
+      ) {
         setError(
           'No Groq API key found. Add VITE_GROQ_API_KEY to your .env file and restart the dev server.',
         );
@@ -60,13 +73,65 @@ export function useLlm(systemPrompt) {
         return null;
       }
 
+      if (isOpenRouter && (!openrouterKey || openrouterKey === 'your_openrouter_api_key_here')) {
+        setError(
+          'No OpenRouter API key found. Add VITE_OPENROUTER_API_KEY to your .env file and restart the dev server.',
+        );
+        setLoading(false);
+        return null;
+      }
+
       const sys = systemPrompt;
       const userMessage = rawUserMessage ?? buildPromptPayload(systemPrompt, inputs).userMessage;
 
       try {
         let result = null;
 
-        if (isMistral) {
+        if (isOpenRouter) {
+          // --- OPENROUTER API CALL ---
+          const realModelId = activeModel.replace(/^openrouter\//, '');
+          const requestBody = {
+            model: realModelId,
+            max_tokens: GROQ_CONFIG.maxTokens,
+            temperature: GROQ_CONFIG.temperature,
+            messages: [
+              { role: 'system', content: sys },
+              { role: 'user', content: userMessage },
+            ],
+          };
+
+          const response = await fetch(OPENROUTER_CONFIG.endpoint, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${openrouterKey}`,
+              'HTTP-Referer': typeof window !== 'undefined' ? window.location.origin : '',
+              'X-Title': 'Prompt Agent Portal',
+            },
+            body: JSON.stringify(requestBody),
+          });
+
+          if (!response.ok) {
+            if (response.status === 401) {
+              setError('Invalid OpenRouter API key. Check your .env file.');
+            } else if (response.status === 429) {
+              const errData = await response.json().catch(() => ({}));
+              setError(
+                `OpenRouter rate limit hit: ${errData?.error?.message || 'Wait a moment and try again.'}`,
+              );
+            } else {
+              const errData = await response.json().catch(() => ({}));
+              setError(
+                `OpenRouter API error ${response.status}: ${errData?.error?.message || response.statusText}`,
+              );
+            }
+            setLoading(false);
+            return null;
+          }
+
+          const data = await response.json();
+          result = data?.choices?.[0]?.message?.content?.trim();
+        } else if (isMistral) {
           // --- MISTRAL API CALL (OpenAI-compatible) ---
           const requestBody = {
             model: activeModel,

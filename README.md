@@ -1,6 +1,6 @@
 # ⚡ Prompt Agent Portal
 
-A developer tool that takes structured coding context as input and generates an optimised, Claude-ready prompt using the **Groq API** (llama-3.3-70b-versatile).
+A developer tool that takes structured coding context as input and generates an optimised, Claude-ready prompt using the **Groq API** (openai/gpt-oss-120b).
 
 Built with React 18 + Vite + Tailwind CSS v3. Runs entirely in the browser — no backend, no database.
 
@@ -65,13 +65,13 @@ Open `src/utils/constants.js` and edit the `GROQ_CONFIG` object:
 ```js
 export const GROQ_CONFIG = {
   endpoint: 'https://api.groq.com/openai/v1/chat/completions',
-  model: 'llama-3.3-70b-versatile', // ← change this
+  model: 'openai/gpt-oss-120b', // ← change this
   maxTokens: 1024,
   temperature: 0.4,
 };
 ```
 
-Available Groq models: `llama-3.1-8b-instant`, `llama-3.3-70b-versatile`, `mixtral-8x7b-32768`, `gemma2-9b-it`.
+Available Groq models: `openai/gpt-oss-120b`, `qwen/qwen3.6-27b`.
 
 ---
 

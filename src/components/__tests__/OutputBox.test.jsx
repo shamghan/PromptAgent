@@ -39,10 +39,24 @@ describe('OutputBox', () => {
     expect(screen.getByText('Regenerate')).toBeTruthy();
   });
 
-  it('copies text to clipboard on Copy click', async () => {
+  it('copies main text to clipboard on Copy click', async () => {
     render(<OutputBox output="copy me" onRegenerate={() => {}} loading={false} />);
-    fireEvent.click(screen.getByText('Copy'));
+    const copyButtons = screen.getAllByText('Copy');
+    fireEvent.click(copyButtons[0]);
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith('copy me');
+    await waitFor(() => {
+      expect(screen.getByText('Copied')).toBeTruthy();
+    });
+  });
+
+  it('renders git branch and commit suggestions with individual copy buttons', async () => {
+    render(<OutputBox output="copy me" onRegenerate={() => {}} loading={false} />);
+    expect(screen.getByText('Suggested Git Branches')).toBeTruthy();
+    expect(screen.getByText('Suggested Git Commit Messages')).toBeTruthy();
+
+    const copyButtons = screen.getAllByText('Copy');
+    // Click a branch copy button (2nd copy button)
+    fireEvent.click(copyButtons[1]);
     await waitFor(() => {
       expect(screen.getByText('Copied')).toBeTruthy();
     });

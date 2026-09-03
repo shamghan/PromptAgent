@@ -1,17 +1,7 @@
+import DEFAULT_SYSTEM_PROMPT_TEXT from './system_prompt.txt?raw';
+
 // ─── Default system prompt ────────────────────────────────────────────────────
-export const DEFAULT_SYSTEM_PROMPT = `You are an expert at writing developer prompts for AI coding assistants.
-
-Your job: take raw coding context from a developer and transform it into a single, high-quality prompt they can paste into any AI assistant and get an expert answer immediately.
-
-Rules:
-- Output ONLY the final prompt. No intro, no explanation, no "Here is your prompt:".
-- Open with one sentence that sets the role: what codebase, language, or domain the assistant is working in — but ONLY if a file name or class name was provided. Never infer the codebase or domain from the method name, line number, or any other field.
-- State the exact location in code (file, class, method, line) so the assistant knows precisely where to focus.
-- If a task ID or description is given, summarise the intent in one line — what business goal is being solved.
-- State the problem or ask sharply. No vague language. If there is an error, include it exactly.
-- Close with a concrete instruction: what the assistant must produce — fixed code, explanation, test, review, etc.
-- Use present tense. Be direct. Write like a senior developer briefing a colleague.
-- Skip missing fields cleanly — do not write "not provided" or leave blank placeholders.`;
+export const DEFAULT_SYSTEM_PROMPT = DEFAULT_SYSTEM_PROMPT_TEXT;
 
 // ─── Task type options ────────────────────────────────────────────────────────
 export const TASK_TYPES = [
@@ -34,15 +24,19 @@ export const STORAGE_KEYS = {
 };
 
 export const AVAILABLE_MODELS = [
-  { value: 'llama-3.3-70b-versatile', label: 'Llama 3.3 70B (Groq)' },
+  { value: 'openai/gpt-oss-120b', label: 'GPT OSS 120B (Groq)' },
+  { value: 'codestral-latest', label: 'Codestral (Mistral)' },
   { value: 'gemma-4-31b-it', label: 'Gemma 4 31B (Gemini)' },
   { value: 'mistral-large-latest', label: 'Mistral Large (Mistral)' },
+  { value: 'openrouter/deepseek/deepseek-chat', label: 'DeepSeek V3 (OpenRouter)' },
+  { value: 'openrouter/deepseek/deepseek-r1', label: 'DeepSeek R1 (OpenRouter)' },
+  { value: 'openrouter/moonshotai/kimi-k3', label: 'Kimi K3 (OpenRouter)' },
 ];
 
 // ─── API config ───────────────────────────────────────────────────────────────
 export const GROQ_CONFIG = {
   endpoint: 'https://api.groq.com/openai/v1/chat/completions',
-  model: 'llama-3.3-70b-versatile', // Default fallback
+  model: 'openai/gpt-oss-120b', // Default fallback
   maxTokens: 1024,
   temperature: 0.4,
 };
@@ -54,6 +48,10 @@ export const GEMINI_CONFIG = {
 
 export const MISTRAL_CONFIG = {
   endpoint: 'https://api.mistral.ai/v1/chat/completions',
+};
+
+export const OPENROUTER_CONFIG = {
+  endpoint: 'https://openrouter.ai/api/v1/chat/completions',
 };
 
 // ─── History ──────────────────────────────────────────────────────────────────
