@@ -233,12 +233,8 @@ export default function App() {
           </div>{' '}
         </div>{' '}
       </header>{' '}
-      {/* Decorative gradient line */}{' '}
-      <div className="h-0.5 w-full bg-gradient-to-r from-brand-500/0 via-brand-500/50 to-brand-500/0" />{' '}
-      {/* TESTING BANNER — remove after CI pipeline validation */}{' '}
-      <div className="bg-green-200 border-2 border-yellow-500 text-yellow-900 text-center py-3 px-4 font-bold text-sm">
-        ⚠ TESTING CI PIPELINE — this banner will be removed soon
-      </div>{' '}
+      {/* Decorative gradient line */}
+      <div className="h-0.5 w-full bg-gradient-to-r from-brand-500/0 via-brand-500/50 to-brand-500/0" />
       {/* MAIN */}{' '}
       <main className="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-6">
         {' '}
