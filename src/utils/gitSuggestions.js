@@ -1,7 +1,12 @@
 /**
  * gitSuggestions.js
- * Utility to extract or generate git branch names and commit messages
- * strictly tailored to the specific kind of work and topic heading.
+ * Utility to extract or generate git branch names and commit messages.
+ * 
+ * Rules:
+ * - Heading created first based on prompt.
+ * - Every branch name MUST start with "feature/"
+ * - Every branch slug MUST contain 5 to 9 words separated by hyphens.
+ * - Every commit message MUST contain 7 to 18 words total.
  */
 
 const STOP_WORDS = new Set([
@@ -12,8 +17,8 @@ const STOP_WORDS = new Set([
   'below', 'above', 'was', 'were', 'prompt', 'generated', 'text', 'banner', 'heading'
 ]);
 
-function extractMeaningfulSlug(text) {
-  if (!text || typeof text !== 'string') return '';
+function extractHeadingWords(text) {
+  if (!text || typeof text !== 'string') return [];
 
   const words = text
     .toLowerCase()
@@ -21,21 +26,65 @@ function extractMeaningfulSlug(text) {
     .split(/\s+/)
     .filter((w) => w.length > 1 && !STOP_WORDS.has(w));
 
-  if (words.length === 0) return '';
-  return words.slice(0, 4).join('-');
+  return words;
 }
 
-function cleanTitle(text) {
-  if (!text || typeof text !== 'string') return '';
-  return text
-    .replace(/^[\s\-*#`>]+|[`\s]+$/g, '')
-    .replace(/^(review|check|fix|refactor|optimize|add|create|implement)\s+/i, '')
-    .trim();
+function formatBranchName(rawWords, variantIndex = 0) {
+  let words = [...rawWords];
+  
+  const padPools = [
+    ['code', 'implementation', 'logic', 'enhancement', 'update'],
+    ['architecture', 'structure', 'quality', 'improvement', 'refactoring'],
+    ['functionality', 'performance', 'optimization', 'workflow', 'changes'],
+  ];
+
+  const padding = padPools[variantIndex % padPools.length];
+
+  while (words.length < 5) {
+    for (const p of padding) {
+      if (!words.includes(p) && words.length < 5) {
+        words.push(p);
+      }
+    }
+    if (words.length < 5) {
+      words.push('update');
+    }
+  }
+
+  if (words.length > 9) {
+    words = words.slice(0, 6 + (variantIndex % 3)); // 6, 7, or 8 words
+  }
+
+  return `feature/${words.join('-')}`;
+}
+
+function formatCommitMessage(scope, rawWords, variantIndex = 0) {
+  const descWords = rawWords.slice(0, 6);
+  const desc = descWords.join(' ');
+  const templates = [
+    `feat(${scope}): ${desc} and improve overall codebase quality`,
+    `feat(${scope}): implement ${desc} with performance optimizations and clean architecture`,
+    `feat(${scope}): restructure ${desc} to resolve bottlenecks and enhance readability`,
+  ];
+
+  let msg = templates[variantIndex % templates.length];
+  let words = msg.split(/\s+/);
+
+  if (words.length < 7) {
+    msg += ' for better maintainability and code performance';
+    words = msg.split(/\s+/);
+  }
+
+  if (words.length > 18) {
+    msg = words.slice(0, 16).join(' ');
+  }
+
+  return msg;
 }
 
 /**
  * Extracts explicit git branches and commits from LLM output, or dynamically generates
- * work-type specific suggestions based on form inputs / prompt heading.
+ * suggestions adhering to the 5-9 word branch and 7-18 word commit constraints.
  *
  * @param {string} output - The generated LLM prompt text
  * @param {Object} [inputs] - Optional form inputs ({ taskType, fileName, className, methodName, issue, taskName })
@@ -54,8 +103,11 @@ export function extractOrGenerateGitSuggestions(output, inputs = {}) {
   if (branchSectionMatch) {
     const rawLines = branchSectionMatch[1].split('\n');
     for (const line of rawLines) {
-      const cleaned = line.replace(/^[\s\-*`>]+|[`\s]+$/g, '').trim();
-      if (cleaned && (cleaned.includes('/') || cleaned.includes('-'))) {
+      let cleaned = line.replace(/^[\s\-*`>]+|[`\s]+$/g, '').trim();
+      if (cleaned) {
+        if (!cleaned.startsWith('feature/')) {
+          cleaned = 'feature/' + cleaned.replace(/^[^/]+\//, '');
+        }
         branches.push(cleaned);
       }
     }
@@ -72,90 +124,62 @@ export function extractOrGenerateGitSuggestions(output, inputs = {}) {
     }
   }
 
-  // 2. Fallback / Enhancement: Generate smart work-type specific suggestions if none parsed
-  if (branches.length === 0 || commits.length === 0) {
-    const headingText =
-      inputs.issue ||
-      inputs.taskName ||
-      inputs.taskDesc ||
-      inputs.methodName ||
-      inputs.className ||
-      inputs.fileName ||
-      output.split('\n')[0] ||
-      'optimize code';
+  // 2. Fallback / Standardizer: Generate suggestions ensuring branch 5-9 words and commit 7-18 words
+  const headingText =
+    inputs.issue ||
+    inputs.taskName ||
+    inputs.taskDesc ||
+    inputs.methodName ||
+    inputs.className ||
+    inputs.fileName ||
+    output.split('\n')[0] ||
+    'optimize code performance';
 
-    const topicSlug = extractMeaningfulSlug(headingText) || 'optimize-code';
-    const rawScope = inputs.fileName || inputs.className || inputs.methodName || 'codebase';
-    const scope = extractMeaningfulSlug(rawScope).slice(0, 15) || 'codebase';
-    const taskType = (inputs.taskType || '').toLowerCase();
-    const desc = topicSlug.replace(/-/g, ' ');
-
-    let b1, b2, b3;
-    let c1, c2, c3;
-
-    if (taskType.includes('bug') || taskType.includes('fix') || headingText.toLowerCase().includes('fix')) {
-      b1 = `fix/${topicSlug}`;
-      b2 = `bugfix/${topicSlug}`;
-      b3 = `fix/${scope}-${topicSlug}`;
-
-      c1 = `fix(${scope}): ${desc}`;
-      c2 = `fix(${scope}): resolve issue in ${desc}`;
-      c3 = `bugfix(${scope}): handle ${desc} error`;
-    } else if (taskType.includes('refactor') || headingText.toLowerCase().includes('refactor')) {
-      b1 = `refactor/${topicSlug}`;
-      b2 = `cleanup/${topicSlug}`;
-      b3 = `refactor/${scope}-${topicSlug}`;
-
-      c1 = `refactor(${scope}): ${desc}`;
-      c2 = `refactor(${scope}): simplify ${desc} logic`;
-      c3 = `cleanup(${scope}): restructure ${desc}`;
-    } else if (taskType.includes('unit') || taskType.includes('test') || headingText.toLowerCase().includes('test')) {
-      b1 = `test/${topicSlug}`;
-      b2 = `testing/${topicSlug}`;
-      b3 = `test/${scope}-${topicSlug}`;
-
-      c1 = `test(${scope}): ${desc}`;
-      c2 = `test(${scope}): add unit tests for ${desc}`;
-      c3 = `test(${scope}): increase test coverage for ${desc}`;
-    } else if (taskType.includes('perf') || taskType.includes('performance') || headingText.toLowerCase().includes('performance') || headingText.toLowerCase().includes('bottleneck')) {
-      b1 = `perf/${topicSlug}`;
-      b2 = `feature/optimize-${topicSlug}`;
-      b3 = `perf/${scope}-${topicSlug}`;
-
-      c1 = `perf(${scope}): ${desc}`;
-      c2 = `perf(${scope}): optimize performance of ${desc}`;
-      c3 = `perf(${scope}): improve speed and efficiency for ${desc}`;
-    } else if (taskType.includes('review') || headingText.toLowerCase().includes('review')) {
-      b1 = `feature/optimize-${topicSlug}`;
-      b2 = `review/${topicSlug}`;
-      b3 = `refactor/${topicSlug}`;
-
-      c1 = `docs(${scope}): address code review feedback for ${desc}`;
-      c2 = `refactor(${scope}): address code review recommendations`;
-      c3 = `chore(${scope}): code review polish for ${desc}`;
-    } else {
-      // Feature or Default
-      b1 = `feature/${topicSlug}`;
-      b2 = `feat/${topicSlug}`;
-      b3 = `feature/${scope}-${topicSlug}`;
-
-      c1 = `feat(${scope}): ${desc}`;
-      c2 = `feat(${scope}): implement ${desc} functionality`;
-      c3 = `feat(${scope}): add support for ${desc}`;
-    }
-
-    if (branches.length === 0) {
-      branches.push(b1, b2, b3);
-    }
-
-    if (commits.length === 0) {
-      commits.push(c1, c2, c3);
-    }
+  let rawWords = extractHeadingWords(headingText);
+  if (rawWords.length === 0) {
+    rawWords = ['optimize', 'codebase', 'performance', 'quality', 'enhancement'];
   }
 
-  // Deduplicate and cap to top 3 each
+  const scopeWords = extractHeadingWords(inputs.fileName || inputs.className || inputs.methodName || 'codebase');
+  const scope = scopeWords[0] || 'codebase';
+
+  if (branches.length === 0) {
+    branches.push(
+      formatBranchName(rawWords, 0),
+      formatBranchName(rawWords.slice(1).concat(rawWords.slice(0, 1)), 1),
+      formatBranchName(rawWords.reverse(), 2),
+    );
+  }
+
+  if (commits.length === 0) {
+    commits.push(
+      formatCommitMessage(scope, rawWords, 0),
+      formatCommitMessage(scope, rawWords, 1),
+      formatCommitMessage(scope, rawWords, 2),
+    );
+  }
+
+  // Ensure every branch starts with feature/ and slug has 5-9 words
+  const sanitizedBranches = branches.map((b, idx) => {
+    let slug = b.replace(/^feature\//i, '').replace(/^[^/]+\//, '');
+    let words = slug.split(/[-_\s]+/).filter(Boolean);
+    if (words.length < 5 || words.length > 9) {
+      return formatBranchName(rawWords, idx);
+    }
+    return `feature/${words.join('-')}`;
+  });
+
+  // Ensure every commit message has 7-18 words
+  const sanitizedCommits = commits.map((c, idx) => {
+    let words = c.split(/\s+/).filter(Boolean);
+    if (words.length < 7 || words.length > 18) {
+      return formatCommitMessage(scope, rawWords, idx);
+    }
+    return c;
+  });
+
   return {
-    branches: Array.from(new Set(branches)).slice(0, 3),
-    commits: Array.from(new Set(commits)).slice(0, 3),
+    branches: Array.from(new Set(sanitizedBranches)).slice(0, 3),
+    commits: Array.from(new Set(sanitizedCommits)).slice(0, 3),
   };
 }

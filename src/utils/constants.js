@@ -12,17 +12,21 @@ Rules:
 - Close with a concrete instruction: what the assistant must produce — fixed code, explanation, test, review, etc.
 - Use present tense. Be direct. Write like a senior developer briefing a colleague.
 - Skip missing fields cleanly — do not write "not provided" or leave blank placeholders.
-- At the very bottom of your output, provide 3 short & professional Git branch suggestions (e.g., feature/optimize-low-quality-code or fix/login-authentication) and 3 commit message suggestions based on the core heading/intent of the work (using fix/, feature/, refactor/, perf/, test/) with these exact markdown headers:
+- At the very bottom of your output, first derive a clear heading based on the prompt, then provide 3 Git branch suggestions and 3 Git commit message suggestions under these exact markdown headers:
+
+Rules for Git Suggestions:
+1. Every branch name MUST start with "feature/" followed by 5 to 9 words separated by hyphens (e.g., "feature/optimize-codebase-performance-and-fix-low-quality-code").
+2. Every git commit message MUST contain between 7 to 18 words total (e.g., "feat(codebase): optimize codebase performance bottlenecks and fix low quality code structures").
 
 ### Suggested Git Branches
-- <work-type-prefix>/<concise-topic-slug>
-- <work-type-prefix>/<concise-topic-slug>
-- <work-type-prefix>/<concise-topic-slug>
+- feature/word1-word2-word3-word4-word5
+- feature/word1-word2-word3-word4-word5-word6
+- feature/word1-word2-word3-word4-word5-word6-word7
 
 ### Suggested Git Commit Messages
-- <type>(scope): <concise summary of work>
-- <type>(scope): <concise summary of work>
-- <type>(scope): <concise summary of work>`;
+- feat(scope): concise detailed commit message between seven and eighteen words total
+- feat(scope): another detailed commit message explaining the change and impact cleanly
+- feat(scope): comprehensive commit message describing code optimizations and quality improvements`;
 
 // ─── Task type options ────────────────────────────────────────────────────────
 export const TASK_TYPES = [
