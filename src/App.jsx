@@ -353,8 +353,12 @@ export default function App() {
           className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-2xl shadow-glass border border-slate-200/60 dark:border-slate-700/60 p-6 sm:p-8 animate-fade-up transition-colors duration-300"
           style={{ animationDelay: '100ms' }}
         >
-          {' '}
-          <OutputBox output={output} onRegenerate={handleRegenerate} loading={loading} />{' '}
+          <OutputBox
+            output={output}
+            onRegenerate={handleRegenerate}
+            loading={loading}
+            inputs={lastInputs || inputs}
+          />
         </section>{' '}
         {/* Stats Strip */}{' '}
         <div
