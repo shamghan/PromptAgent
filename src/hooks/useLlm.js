@@ -42,7 +42,7 @@ export function useLlm(systemPrompt) {
       const groqKey = import.meta.env.VITE_GROQ_API_KEY;
       const geminiKey = import.meta.env.VITE_GEMINI_API_KEY;
       const mistralKey = import.meta.env.VITE_MISTRAL_API_KEY;
-      const openrouterKey = import.meta.env.VITE_OPENROUTER_API_KEY;
+      const openrouterKey = import.meta.env.KEY_OPENROUTER_API;
 
       if (
         !usesGeminiApi &&
@@ -75,7 +75,7 @@ export function useLlm(systemPrompt) {
 
       if (isOpenRouter && (!openrouterKey || openrouterKey === 'your_openrouter_api_key_here')) {
         setError(
-          'No OpenRouter API key found. Add VITE_OPENROUTER_API_KEY to your .env file and restart the dev server.',
+          'No OpenRouter API key found. Add KEY_OPENROUTER_API to your .env file and restart the dev server.',
         );
         setLoading(false);
         return null;
