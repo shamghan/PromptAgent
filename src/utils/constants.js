@@ -34,7 +34,7 @@ export const STORAGE_KEYS = {
 };
 
 export const AVAILABLE_MODELS = [
-  { value: 'llama-3.3-70b-versatile', label: 'Llama 3.3 70B (Groq)' },
+  { value: 'openai/gpt-oss-120b', label: 'GPT OSS 120B (Groq)' },
   { value: 'gemma-4-31b-it', label: 'Gemma 4 31B (Gemini)' },
   { value: 'mistral-large-latest', label: 'Mistral Large (Mistral)' },
 ];
@@ -42,7 +42,7 @@ export const AVAILABLE_MODELS = [
 // ─── API config ───────────────────────────────────────────────────────────────
 export const GROQ_CONFIG = {
   endpoint: 'https://api.groq.com/openai/v1/chat/completions',
-  model: 'llama-3.3-70b-versatile', // Default fallback
+  model: 'openai/gpt-oss-120b', // Default fallback
   maxTokens: 1024,
   temperature: 0.4,
 };
