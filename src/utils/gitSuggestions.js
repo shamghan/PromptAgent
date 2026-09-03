@@ -30,41 +30,40 @@ function extractHeadingWords(text) {
 }
 
 function formatBranchName(rawWords, variantIndex = 0) {
-  let words = [...rawWords];
-  
-  const padPools = [
-    ['code', 'implementation', 'logic', 'enhancement', 'update'],
-    ['architecture', 'structure', 'quality', 'improvement', 'refactoring'],
-    ['functionality', 'performance', 'optimization', 'workflow', 'changes'],
+  let baseWords = rawWords.slice(0, 4);
+  if (baseWords.length === 0) baseWords = ['optimize', 'codebase', 'performance'];
+
+  const templates = [
+    [...baseWords, 'and', 'improve', 'code', 'quality'],
+    ['optimize', ...baseWords, 'for', 'better', 'performance'],
+    ['refactor', ...baseWords, 'to', 'enhance', 'efficiency'],
   ];
 
-  const padding = padPools[variantIndex % padPools.length];
-
-  while (words.length < 5) {
-    for (const p of padding) {
-      if (!words.includes(p) && words.length < 5) {
-        words.push(p);
-      }
-    }
-    if (words.length < 5) {
-      words.push('update');
+  let selected = templates[variantIndex % templates.length];
+  let uniqueWords = [];
+  for (const w of selected) {
+    if (!uniqueWords.includes(w) || w === 'and' || w === 'to' || w === 'for') {
+      uniqueWords.push(w);
     }
   }
 
-  if (words.length > 9) {
-    words = words.slice(0, 6 + (variantIndex % 3)); // 6, 7, or 8 words
+  while (uniqueWords.length < 5) {
+    uniqueWords.push('enhancement');
   }
 
-  return `feature/${words.join('-')}`;
+  if (uniqueWords.length > 9) {
+    uniqueWords = uniqueWords.slice(0, 8);
+  }
+
+  return `feature/${uniqueWords.join('-')}`;
 }
 
 function formatCommitMessage(scope, rawWords, variantIndex = 0) {
-  const descWords = rawWords.slice(0, 6);
-  const desc = descWords.join(' ');
+  const topic = rawWords.slice(0, 4).join(' ');
   const templates = [
-    `feat(${scope}): ${desc} and improve overall codebase quality`,
-    `feat(${scope}): implement ${desc} with performance optimizations and clean architecture`,
-    `feat(${scope}): restructure ${desc} to resolve bottlenecks and enhance readability`,
+    `feat(${scope}): ${topic} and improve overall codebase performance and quality`,
+    `feat(${scope}): implement ${topic} with performance optimizations and clean architecture`,
+    `feat(${scope}): restructure ${topic} to eliminate bottlenecks and enhance code readability`,
   ];
 
   let msg = templates[variantIndex % templates.length];
@@ -137,7 +136,7 @@ export function extractOrGenerateGitSuggestions(output, inputs = {}) {
 
   let rawWords = extractHeadingWords(headingText);
   if (rawWords.length === 0) {
-    rawWords = ['optimize', 'codebase', 'performance', 'quality', 'enhancement'];
+    rawWords = ['optimize', 'codebase', 'performance', 'quality'];
   }
 
   const scopeWords = extractHeadingWords(inputs.fileName || inputs.className || inputs.methodName || 'codebase');
@@ -146,8 +145,8 @@ export function extractOrGenerateGitSuggestions(output, inputs = {}) {
   if (branches.length === 0) {
     branches.push(
       formatBranchName(rawWords, 0),
-      formatBranchName(rawWords.slice(1).concat(rawWords.slice(0, 1)), 1),
-      formatBranchName(rawWords.reverse(), 2),
+      formatBranchName(rawWords, 1),
+      formatBranchName(rawWords, 2),
     );
   }
 
