@@ -16,7 +16,7 @@ Review the entire codebase for performance bottlenecks and low-quality code.
     };
 
     const { branches, commits } = extractOrGenerateGitSuggestions(sampleOutput, inputs);
-    
+
     expect(branches.length).toBeGreaterThan(0);
     expect(commits.length).toBeGreaterThan(0);
 
@@ -42,7 +42,7 @@ Review the entire codebase for performance bottlenecks and low-quality code.
     };
 
     const { branches, commits } = extractOrGenerateGitSuggestions('Prompt text', inputs);
-    
+
     branches.forEach((b) => {
       expect(b.startsWith('feature/')).toBe(true);
       const words = b.replace('feature/', '').split('-');

@@ -17,11 +17,11 @@ Instructions for Git Branch Names & Commit Messages:
 - Then, provide 3 suggested Git branch names and 3 suggested Git commit messages under these exact markdown headers:
 
 Rules for Git Branches:
-1. Every branch name MUST start with "feature/" followed by 5 to 9 natural, grammatically correct words separated by hyphens (e.g., "feature/optimize-codebase-performance-and-fix-low-quality-code").
+1. Every branch name MUST start with "feature/" followed by 5 to 12 natural, grammatically correct words separated by hyphens (e.g., "feature/optimize-codebase-performance-and-fix-low-quality-code").
 2. Do not scramble words or repeat words (avoid awkward phrasing like "code-quality-low-find-code"). Make the branch name read like a natural developer branch name.
 
 Rules for Git Commit Messages:
-1. Every git commit message MUST contain between 7 to 18 natural, fluent words total.
+1. Every git commit message MUST contain between 7 to 20 natural, fluent words total.
 2. Follow Conventional Commits format: feat(scope): message or fix(scope): message.
 
 ### Suggested Git Branches
