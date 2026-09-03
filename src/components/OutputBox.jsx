@@ -54,10 +54,24 @@ export default function OutputBox({ output, onRegenerate, loading, inputs }) {
     }
   }, [output]);
 
-  // Clean prompt text by removing git section headers if included in LLM output
-  const cleanPrompt = output
-    ? output.split(/###\s*Suggested\s*Git/i)[0].trim()
-    : '';
+  // Clean prompt text by removing trailing markdown headers or separators if included in LLM output
+  const cleanPrompt = (() => {
+    if (!output) return '';
+    let text = output;
+
+    // Split on explicit separator or Git section if present
+    if (text.includes('---')) {
+      text = text.split('---')[0];
+    }
+    if (/###\s*Suggested\s*Git/i.test(text)) {
+      text = text.split(/###\s*Suggested\s*Git/i)[0];
+    }
+
+    // Remove any trailing markdown headings or isolated hash lines
+    text = text.replace(/(\r?\n)*\s*(###\s*.*|#\s*)$/gi, '');
+
+    return text.trim();
+  })();
 
   const { branches, commits } = output
     ? extractOrGenerateGitSuggestions(output, inputs || {})
