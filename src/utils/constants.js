@@ -12,17 +12,17 @@ Rules:
 - Close with a concrete instruction: what the assistant must produce — fixed code, explanation, test, review, etc.
 - Use present tense. Be direct. Write like a senior developer briefing a colleague.
 - Skip missing fields cleanly — do not write "not provided" or leave blank placeholders.
-- At the very bottom of your output, provide 3 short & professional Git branch suggestions and 3 commit message suggestions strictly tailored to the specific kind of work (e.g. fix/ for Bug fix, feature/ for Feature, refactor/ for Refactor, perf/ for Performance, test/ for Unit test) using these exact markdown headers:
+- At the very bottom of your output, provide 3 short & professional Git branch suggestions (e.g., `feature/optimize-low-quality-code` or `fix/login-authentication`) and 3 commit message suggestions based on the core heading/intent of the work (using fix/, feature/, refactor/, perf/, test/) with these exact markdown headers:
 
 ### Suggested Git Branches
-- <work-type-prefix>/...
-- <work-type-prefix>/...
-- <work-type-prefix>/...
+- <work-type-prefix>/<concise-topic-slug>
+- <work-type-prefix>/<concise-topic-slug>
+- <work-type-prefix>/<concise-topic-slug>
 
 ### Suggested Git Commit Messages
-- <type>(scope): ...
-- <type>(scope): ...
-- <type>(scope): ...`;
+- <type>(scope): <concise summary of work>
+- <type>(scope): <concise summary of work>
+- <type>(scope): <concise summary of work>`;
 
 // ─── Task type options ────────────────────────────────────────────────────────
 export const TASK_TYPES = [

@@ -12,18 +12,30 @@ describe('gitSuggestions', () => {
 Here is your prompt.
 
 ### Suggested Git Branches
-- feature/optimize-use-login-code
-- refactor/use-login-hook
+- feature/optimize-low-quality-code
+- refactor/codebase-performance
 
 ### Suggested Git Commit Messages
-- feat(auth): optimize useLogin code
-- refactor(auth): simplify login hook logic
+- feat(codebase): optimize low quality code
+- refactor(codebase): improve performance and readability
     `;
 
     const { branches, commits } = extractOrGenerateGitSuggestions(sampleOutput);
-    expect(branches).toContain('feature/optimize-use-login-code');
-    expect(branches).toContain('refactor/use-login-hook');
-    expect(commits).toContain('feat(auth): optimize useLogin code');
+    expect(branches).toContain('feature/optimize-low-quality-code');
+    expect(branches).toContain('refactor/codebase-performance');
+    expect(commits).toContain('feat(codebase): optimize low quality code');
+  });
+
+  it('filters stop words and creates clean heading-based branch names', () => {
+    const inputs = {
+      taskType: 'Performance',
+      issue: 'Review the entire codebase for performance bottlenecks and low-quality code.',
+    };
+    const { branches, commits } = extractOrGenerateGitSuggestions('Prompt text', inputs);
+    expect(branches[0]).not.toContain('i-want-you-to');
+    expect(branches[0]).not.toContain('the-entire-codebase');
+    expect(branches[0]).toContain('perf/');
+    expect(commits[0]).toContain('perf(');
   });
 
   it('generates Bug fix specific suggestions', () => {

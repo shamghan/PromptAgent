@@ -1,24 +1,41 @@
 /**
  * gitSuggestions.js
  * Utility to extract or generate git branch names and commit messages
- * strictly tailored to the specific kind of work being performed.
+ * strictly tailored to the specific kind of work and topic heading.
  */
 
-function slugify(text) {
-  if (!text) return '';
-  return text
+const STOP_WORDS = new Set([
+  'i', 'want', 'you', 'to', 'check', 'all', 'and', 'the', 'entire', 'for', 'of', 'a', 'an',
+  'is', 'are', 'this', 'that', 'with', 'in', 'on', 'at', 'by', 'from', 'as', 'please',
+  'would', 'like', 'should', 'be', 'based', 'same', 'comment', 'could', 'which', 'what',
+  'kind', 'work', 'here', 'there', 'some', 'any', 'my', 'your', 'our', 'their', 'we',
+  'below', 'above', 'was', 'were', 'prompt', 'generated', 'text', 'banner', 'heading'
+]);
+
+function extractMeaningfulSlug(text) {
+  if (!text || typeof text !== 'string') return '';
+
+  const words = text
     .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .trim()
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .slice(0, 35)
-    .replace(/-$/, '');
+    .replace(/[^a-z0-9\s-]/g, ' ')
+    .split(/\s+/)
+    .filter((w) => w.length > 1 && !STOP_WORDS.has(w));
+
+  if (words.length === 0) return '';
+  return words.slice(0, 4).join('-');
+}
+
+function cleanTitle(text) {
+  if (!text || typeof text !== 'string') return '';
+  return text
+    .replace(/^[\s\-*#`>]+|[`\s]+$/g, '')
+    .replace(/^(review|check|fix|refactor|optimize|add|create|implement)\s+/i, '')
+    .trim();
 }
 
 /**
  * Extracts explicit git branches and commits from LLM output, or dynamically generates
- * work-type specific suggestions based on form inputs / prompt context.
+ * work-type specific suggestions based on form inputs / prompt heading.
  *
  * @param {string} output - The generated LLM prompt text
  * @param {Object} [inputs] - Optional form inputs ({ taskType, fileName, className, methodName, issue, taskName })
@@ -57,34 +74,34 @@ export function extractOrGenerateGitSuggestions(output, inputs = {}) {
 
   // 2. Fallback / Enhancement: Generate smart work-type specific suggestions if none parsed
   if (branches.length === 0 || commits.length === 0) {
-    const topicRaw =
+    const headingText =
       inputs.issue ||
       inputs.taskName ||
+      inputs.taskDesc ||
       inputs.methodName ||
       inputs.className ||
       inputs.fileName ||
-      inputs.taskDesc ||
       output.split('\n')[0] ||
-      'code-update';
+      'optimize code';
 
-    const topicSlug = slugify(topicRaw) || 'update-code';
-    const rawScope = inputs.fileName || inputs.className || inputs.methodName || 'core';
-    const scope = slugify(rawScope).slice(0, 15) || 'core';
+    const topicSlug = extractMeaningfulSlug(headingText) || 'optimize-code';
+    const rawScope = inputs.fileName || inputs.className || inputs.methodName || 'codebase';
+    const scope = extractMeaningfulSlug(rawScope).slice(0, 15) || 'codebase';
     const taskType = (inputs.taskType || '').toLowerCase();
     const desc = topicSlug.replace(/-/g, ' ');
 
     let b1, b2, b3;
     let c1, c2, c3;
 
-    if (taskType.includes('bug') || taskType.includes('fix')) {
+    if (taskType.includes('bug') || taskType.includes('fix') || headingText.toLowerCase().includes('fix')) {
       b1 = `fix/${topicSlug}`;
       b2 = `bugfix/${topicSlug}`;
       b3 = `fix/${scope}-${topicSlug}`;
 
       c1 = `fix(${scope}): ${desc}`;
-      c2 = `fix(${scope}): resolve issue with ${desc}`;
-      c3 = `bugfix(${scope}): handle edge case in ${desc}`;
-    } else if (taskType.includes('refactor')) {
+      c2 = `fix(${scope}): resolve issue in ${desc}`;
+      c3 = `bugfix(${scope}): handle ${desc} error`;
+    } else if (taskType.includes('refactor') || headingText.toLowerCase().includes('refactor')) {
       b1 = `refactor/${topicSlug}`;
       b2 = `cleanup/${topicSlug}`;
       b3 = `refactor/${scope}-${topicSlug}`;
@@ -92,7 +109,7 @@ export function extractOrGenerateGitSuggestions(output, inputs = {}) {
       c1 = `refactor(${scope}): ${desc}`;
       c2 = `refactor(${scope}): simplify ${desc} logic`;
       c3 = `cleanup(${scope}): restructure ${desc}`;
-    } else if (taskType.includes('unit') || taskType.includes('test')) {
+    } else if (taskType.includes('unit') || taskType.includes('test') || headingText.toLowerCase().includes('test')) {
       b1 = `test/${topicSlug}`;
       b2 = `testing/${topicSlug}`;
       b3 = `test/${scope}-${topicSlug}`;
@@ -100,17 +117,17 @@ export function extractOrGenerateGitSuggestions(output, inputs = {}) {
       c1 = `test(${scope}): ${desc}`;
       c2 = `test(${scope}): add unit tests for ${desc}`;
       c3 = `test(${scope}): increase test coverage for ${desc}`;
-    } else if (taskType.includes('perf') || taskType.includes('performance')) {
+    } else if (taskType.includes('perf') || taskType.includes('performance') || headingText.toLowerCase().includes('performance') || headingText.toLowerCase().includes('bottleneck')) {
       b1 = `perf/${topicSlug}`;
-      b2 = `optimize/${topicSlug}`;
+      b2 = `feature/optimize-${topicSlug}`;
       b3 = `perf/${scope}-${topicSlug}`;
 
       c1 = `perf(${scope}): ${desc}`;
       c2 = `perf(${scope}): optimize performance of ${desc}`;
-      c3 = `perf(${scope}): improve speed and memory for ${desc}`;
-    } else if (taskType.includes('review') || taskType.includes('code review')) {
-      b1 = `review/${topicSlug}`;
-      b2 = `audit/${topicSlug}`;
+      c3 = `perf(${scope}): improve speed and efficiency for ${desc}`;
+    } else if (taskType.includes('review') || headingText.toLowerCase().includes('review')) {
+      b1 = `feature/optimize-${topicSlug}`;
+      b2 = `review/${topicSlug}`;
       b3 = `refactor/${topicSlug}`;
 
       c1 = `docs(${scope}): address code review feedback for ${desc}`;
