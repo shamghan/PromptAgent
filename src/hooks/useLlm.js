@@ -115,7 +115,10 @@ export function useLlm(systemPrompt) {
             if (response.status === 401) {
               setError('Invalid OpenRouter API key. Check your .env file.');
             } else if (response.status === 429) {
-              setError('OpenRouter rate limit hit. Wait a moment and try again.');
+              const errData = await response.json().catch(() => ({}));
+              setError(
+                `OpenRouter rate limit hit: ${errData?.error?.message || 'Wait a moment and try again.'}`,
+              );
             } else {
               const errData = await response.json().catch(() => ({}));
               setError(

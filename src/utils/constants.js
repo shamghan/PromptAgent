@@ -38,9 +38,9 @@ export const AVAILABLE_MODELS = [
   { value: 'codestral-latest', label: 'Codestral (Mistral)' },
   { value: 'gemma-4-31b-it', label: 'Gemma 4 31B (Gemini)' },
   { value: 'mistral-large-latest', label: 'Mistral Large (Mistral)' },
-  { value: 'openrouter/deepseek/deepseek-v4-pro-0813', label: 'DeepSeek V4 Pro (OpenRouter)' },
+  { value: 'openrouter/deepseek/deepseek-chat', label: 'DeepSeek V3 (OpenRouter)' },
+  { value: 'openrouter/deepseek/deepseek-r1', label: 'DeepSeek R1 (OpenRouter)' },
   { value: 'openrouter/moonshotai/kimi-k3', label: 'Kimi K3 (OpenRouter)' },
-  { value: 'openrouter/z-ai/glm-5.2:free', label: 'GLM 5.2 Free (OpenRouter)' },
 ];
 
 // ─── API config ───────────────────────────────────────────────────────────────
